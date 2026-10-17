@@ -27,7 +27,12 @@ vi.mock("../../state/entities", () => ({
   useThreadProjection: () => ({ projection: state.projection }),
   useThreadShells: () => state.shells,
   useProjects: () => state.projects,
-  useServerConfigs: () => state.configs,
+}));
+vi.mock("../../state/environments", () => ({
+  useEnvironmentProviders: () =>
+    new Map(
+      [...state.configs].map(([id, config]) => [id, (config as { providers: unknown }).providers]),
+    ),
 }));
 vi.mock("../../lib/archivedThreadsState", () => ({
   useArchivedThreadSnapshots: () => ({ snapshots: [] }),

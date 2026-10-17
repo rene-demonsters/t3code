@@ -52,12 +52,8 @@ import { useState, type ReactNode } from "react";
 
 import { useArchivedThreadSnapshots } from "../../lib/archivedThreadsState";
 import { buildThreadRouteParams } from "../../threadRoutes";
-import {
-  useProjects,
-  useServerConfigs,
-  useThreadProjection,
-  useThreadShells,
-} from "../../state/entities";
+import { useProjects, useThreadProjection, useThreadShells } from "../../state/entities";
+import { useEnvironmentProviders } from "../../state/environments";
 import { threadEnvironment } from "../../state/threads";
 import { orchestrationEnvironment } from "../../state/orchestration";
 import { useAtomCommand } from "../../state/use-atom-command";
@@ -210,7 +206,7 @@ export function ThreadRelationshipsPanel(props: {
 }) {
   const ref = scopeThreadRef(props.environmentId, props.threadId);
   const projection = useThreadProjection(ref)?.projection ?? null;
-  const serverConfigs = useServerConfigs();
+  const providersByEnvironment = useEnvironmentProviders();
   const threadShells = useThreadShells();
   const allProjects = useProjects();
   const archived = useArchivedThreadSnapshots([props.environmentId]);
@@ -226,7 +222,7 @@ export function ThreadRelationshipsPanel(props: {
   const [stoppingId, setStoppingId] = useState<string | null>(null);
   // These lookups and the graph walk every subagent and thread, so they sit below
   // the panel's hooks where the compiler can cache them.
-  const providers = serverConfigs.get(props.environmentId)?.providers;
+  const providers = providersByEnvironment.get(props.environmentId);
   const projects = allProjects.filter((project) => project.environmentId === props.environmentId);
   const archivedShells = archived.snapshots.find(
     (entry) => entry.environmentId === props.environmentId,
